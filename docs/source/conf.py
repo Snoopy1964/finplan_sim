@@ -16,6 +16,7 @@ author = 'Ralf Ehret'
 extensions = [
     'sphinx.ext.autodoc',
     'sphinx.ext.viewcode',
+    'sphinx.ext.napoleon'	
 ]
 
 templates_path = ['_templates']
@@ -28,3 +29,10 @@ exclude_patterns = []
 
 html_theme = 'alabaster'
 html_static_path = ['_static']
+
+# Add the project root to sys.path to ensure Sphinx can find the source modules
+import os
+import sys
+# Ensure the project root is in sys.path
+sys.path.insert(0, os.path.abspath('../..'))
+
