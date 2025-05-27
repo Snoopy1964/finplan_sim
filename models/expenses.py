@@ -1,6 +1,7 @@
 from datetime import date
 import pandas as pd
 from .base_component import BaseComponent
+from utils.timeutils import date_range_index, zero_series
 
 class ExpenseComponent(BaseComponent):
     def __init__(self, loan: float, living: float):
@@ -8,5 +9,6 @@ class ExpenseComponent(BaseComponent):
         self.living = living
 
     def simulate(self, start: date, end: date) -> pd.Series:
-        index = pd.date_range(start, end, freq="MS")
-        return pd.Series(self.loan + self.living, index=index, name="expenses")
+        ts_index = date_range_index(start, end, freq="MS")
+
+        return pd.Series(self.loan + self.living, index=ts_index, name="expenses")
