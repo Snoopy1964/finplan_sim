@@ -1,0 +1,66 @@
+plan:
+  start: 2025-06-01
+  end: 2040-12-31
+  gross_return: 3.0
+cashflow:
+  income:
+    salary_before_retirement: 5000
+    pension_after_retirement: 3000
+    rental_income:
+      rate_per_m2: 9.0
+      total_area_m2: 236
+      tax_rate:
+        until_2030: 0.42
+        from_2031: 0.3
+    capital_drawdown:
+      monthly: 2000
+      sales_value: 500000
+  expenses: {}
+real_estate_assets:
+- name: Ludwigshafen
+  purchase_price: 125000
+  area_m2: 236
+  rent_per_m2: 8.97
+  indexed_rent_per_year: 0.018
+  planned_sale_date: 2025-10-31
+  estimated_value: 500000
+  valuation_date: 2025-05-31
+  loans:
+  - name: BW
+    remaining_principal: 107390.8
+    interest_rate: 0.0187
+    number_of_payments: 436
+    monthly_payment: 310.92
+- name: Walldorf
+  purchase_price: 347678
+  area_m2: 165
+  rent_per_m2: null
+  indexed_rent_per_year: null
+  planned_sale_date: null
+  estimated_value: 670000
+  valuation_date: 2025-05-31
+  loans:
+  - name: AXA
+    remaining_principal: 79543.71
+    interest_rate: 0.0354
+    number_of_payments: 92
+    monthly_payment: 996.33
+- name: Leipzig
+  purchase_price: 160000
+  area_m2: 774.89
+  rent_per_m2: 8.8
+  indexed_rent_per_year: null
+  planned_sale_date: 2025-12-31
+  estimated_value: 251000
+  valuation_date: 2025-05-31
+  loans:
+  - name: DB
+    remaining_principal: 72149.69
+    interest_rate: 0.0105
+    number_of_payments: 84
+    monthly_payment: 623.78
+  - name: DB_KFW
+    remaining_principal: 5352.58
+    interest_rate: 0.015
+    number_of_payments: 59
+    monthly_payment: 94.18
