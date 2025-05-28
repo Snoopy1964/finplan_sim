@@ -34,5 +34,6 @@ html_static_path = ['_static']
 import os
 import sys
 # Ensure the project root is in sys.path
-sys.path.insert(0, os.path.abspath('../..'))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), '../../')))  # ensure /finplan_sim is in sys.path
 
+# import models.income

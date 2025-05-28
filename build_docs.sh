@@ -1,10 +1,15 @@
 #!/bin/bash
+cd docs
+
 
 pwd
 
-cd docs
-sphinx-apidoc -o source ../models
-sphinx-apidoc -o source ../utils
+
+make clean
+# sphinx-apidoc --module-first -o source ../models/*.py 
+# sphinx-apidoc --module-first -o source ../utils/*.py 
+
+echo "Building HTML documentation..."
 make html
 if [ $? -eq 0 ]; then
     echo "Documentation built successfully."

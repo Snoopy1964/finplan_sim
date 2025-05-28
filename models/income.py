@@ -1,6 +1,6 @@
 from datetime import date
 import pandas as pd
-from .base_component import BaseComponent
+from models.base_component import BaseComponent
 from utils.timeutils import date_range_index, zero_series
 
 class IncomeComponent(BaseComponent):

@@ -1,7 +1,7 @@
 from dataclasses import dataclass
 from datetime import date
-from .income import IncomeComponent
-from .expenses import ExpenseComponent
+from models.income import IncomeComponent
+from models.expenses import ExpenseComponent
 
 @dataclass
 class Plan:

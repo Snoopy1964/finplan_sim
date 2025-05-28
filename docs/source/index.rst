@@ -13,5 +13,11 @@ documentation for details.
 
 .. toctree::
    :maxdepth: 2
-   :caption: Contents:
+   :caption: API Reference
 
+   models
+   utils
+
+* :ref:`genindex`
+* :ref:`modindex`
+* :ref:`search`
