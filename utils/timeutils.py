@@ -1,6 +1,19 @@
-from datetime import date
+from datetime import date, datetime
 import pandas as pd
 
+def as_date(val):
+    """
+    Converts a value to a datetime.date object.
+    If the value is already a date, it returns it as is.
+    If the value is a string, it attempts to parse it as a date.
+    Parameters:
+        val: The value to convert, can be a date or a string in 'YYYY-MM-DD' format.
+    Returns:
+        date: A datetime.date object."""
+    
+    if isinstance(val, date):
+        return val
+    return datetime.strptime(val, "%Y-%m-%d").date()
 
 def date_range_index(start: date, end: date, freq: str = "MS") -> pd.Index:
     """
@@ -18,7 +31,8 @@ def date_range_index(start: date, end: date, freq: str = "MS") -> pd.Index:
     return pd.Index([d.date() for d in pd.date_range(start, end, freq=freq)])
 
 
-def zero_series(start: date, end: date, name: str = None, freq: str = "MS") -> pd.Series:
+def zero_series(start: date, end: date, name: str 
+                , freq: str = "MS") -> pd.Series:
     """
     Creates a zero-initialized pandas Series with a datetime.date index.
 

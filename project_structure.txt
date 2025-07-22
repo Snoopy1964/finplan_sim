@@ -1,0 +1,87 @@
+.
+├── LICENSE
+├── README.md
+├── build_docs.sh
+├── config
+│   └── plan-default.yaml
+├── docs
+│   ├── Makefile
+│   ├── build
+│   │   ├── doctrees
+│   │   │   ├── environment.pickle
+│   │   │   ├── index.doctree
+│   │   │   ├── models.doctree
+│   │   │   └── utils.doctree
+│   │   └── html
+│   │       ├── _modules
+│   │       │   ├── index.html
+│   │       │   ├── models
+│   │       │   │   ├── base_component.html
+│   │       │   │   ├── expenses.html
+│   │       │   │   ├── income.html
+│   │       │   │   └── plan.html
+│   │       │   └── utils
+│   │       │       └── timeutils.html
+│   │       ├── _sources
+│   │       │   ├── index.rst.txt
+│   │       │   ├── models.rst.txt
+│   │       │   └── utils.rst.txt
+│   │       ├── _static
+│   │       │   ├── alabaster.css
+│   │       │   ├── basic.css
+│   │       │   ├── custom.css
+│   │       │   ├── doctools.js
+│   │       │   ├── documentation_options.js
+│   │       │   ├── file.png
+│   │       │   ├── github-banner.svg
+│   │       │   ├── language_data.js
+│   │       │   ├── minus.png
+│   │       │   ├── plus.png
+│   │       │   ├── pygments.css
+│   │       │   ├── searchtools.js
+│   │       │   └── sphinx_highlight.js
+│   │       ├── genindex.html
+│   │       ├── index.html
+│   │       ├── models.html
+│   │       ├── objects.inv
+│   │       ├── py-modindex.html
+│   │       ├── search.html
+│   │       ├── searchindex.js
+│   │       └── utils.html
+│   ├── requirements.txt
+│   └── source
+│       ├── _static
+│       ├── _templates
+│       ├── conf.py
+│       ├── index.rst
+│       ├── models.rst
+│       └── utils.rst
+├── main.py
+├── models
+│   ├── __init__.py
+│   ├── __pycache__
+│   │   ├── __init__.cpython-310.pyc
+│   │   ├── __init__.cpython-313.pyc
+│   │   ├── base_component.cpython-310.pyc
+│   │   ├── expenses.cpython-310.pyc
+│   │   ├── income.cpython-310.pyc
+│   │   ├── income.cpython-313.pyc
+│   │   └── plan.cpython-310.pyc
+│   ├── base_component.py
+│   ├── expenses.py
+│   ├── income.py
+│   └── plan.py
+├── project_structure.txt
+├── requirements.txt
+├── simulation
+│   ├── __pycache__
+│   │   └── cashflow_simulator.cpython-310.pyc
+│   └── cashflow_simulator.py
+└── utils
+    ├── __init__.py
+    ├── __pycache__
+    │   ├── __init__.cpython-310.pyc
+    │   └── timeutils.cpython-310.pyc
+    └── timeutils.py
+
+19 directories, 65 files
