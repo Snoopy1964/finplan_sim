@@ -1,19 +1,39 @@
 from datetime import date
 from models.loan import Loan
 
+
+def test_loan_factory():
+    loan_cfg = {
+        "name": "Mein Kredit",
+        "opening_date": date(2023, 1, 1),
+        "remaining_principal": 120_000,
+        "interest_rate": 2.0,
+        "monthly_payment": 500.00
+    }
+    loan = Loan.from_cfg(loan_cfg)
+    assert isinstance(loan, Loan)
+
+    assert loan.name == "Mein Kredit"
+    assert loan.opening_date == date(2023, 1, 1)
+    assert loan.remaining_principal == 120_000
+    assert loan.initial_interest_rate == 2.0
+    assert round(loan.initial_payment_rate, 4) == 3.0        # calculated initial payment rate
+    assert round(loan.initial_monthly_payment, 2) == 500.00  # 120_000 * (2+3)/100/12
+    assert len(loan.actions) == 2  # Initial payment and interest rate action
+
 def test_loan_creation():
     loan = Loan(
         name="Mein Kredit",
         opening_date=date(2023, 1, 1),
-        principal=100_000,
+        remaining_principal=100_000,
         interest_rate=2.0,
         monthly_payment=416.67
     )
     assert loan.name == "Mein Kredit"
     assert loan.opening_date == date(2023, 1, 1)
-    assert loan.principal == 100_000
+    assert loan.remaining_principal == 100_000
     assert loan.initial_interest_rate == 2.0
-    assert loan.initial_payment_rate == 3.0
+    assert round(loan.initial_payment_rate, 4) == 3.0
     assert round(loan.initial_monthly_payment, 2) == 416.67  # 100_000 * (2+3)/100/12
     assert len(loan.actions) == 2  # Initial payment and interest rate action
 
@@ -21,7 +41,7 @@ def test_add_extra_payment():
     loan = Loan(
         name="Test",
         opening_date=date(2024, 1, 1),
-        principal=50_000,
+        remaining_principal=50_000,
         interest_rate=1.5,
         monthly_payment=166.67
     )
@@ -35,7 +55,7 @@ def test_change_interest_rate():
     loan = Loan(
         name="Test",
         opening_date=date(2023, 1, 1),
-        principal=100_000,
+        remaining_principal=100_000,
         interest_rate=1.5,
         monthly_payment=333.33
     )
@@ -49,7 +69,7 @@ def test_pay_off_full():
     loan = Loan(
         name="Test",
         opening_date=date(2023, 1, 1),
-        principal=100_000,
+        remaining_principal=100_000,
         interest_rate=1.5,
         monthly_payment=333.33
     )
@@ -64,7 +84,7 @@ def test_monthly_payment_change():
     loan = Loan(
         name="Test",
         opening_date=date(2023, 1, 1),
-        principal=100_000,
+        remaining_principal=100_000,
         interest_rate=1.5,
         monthly_payment=333.33
     )

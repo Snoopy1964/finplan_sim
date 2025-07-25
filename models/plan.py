@@ -7,7 +7,9 @@ import yaml
 
 # from models.income import IncomeComponent
 # from models.expenses import ExpenseComponent
-from utils.timeutils import as_date
+from models.assets import RealEstateAsset
+from utils.timeutils import as_date, as_period
+from utils.constants import PERIOD_FREQ
 
 # @dataclass
 class Plan:
@@ -21,19 +23,28 @@ class Plan:
         config_file = os.path.join(os.path.dirname(__file__), '..', 'config', config_file)
 
         with open(config_file, 'r', encoding='utf-8') as f:
-            config = yaml.safe_load(f)
+            full_cfg = yaml.safe_load(f)
 
-        self.plan = config["plan"]
-        self.cashflow = config["cashflow"]
-        self.real_estate_assets = config["real_estate_assets"]
-        
-        # Optional: Konvertiere Start/Ende in datetime.date
-        self.start = as_date(self.plan["start"])
-        self.end = as_date(self.plan["end"])
+        self.plan_cfg = full_cfg["plan"]
+        self.cashflow_cfg = full_cfg["cashflow"]
+        self.real_estate_assets_cfg = full_cfg.get("real_estate_assets", [])
+        if len(self.real_estate_assets_cfg) > 0:
+            self.real_estate_assets = [RealEstateAsset.from_cfg(asset_cfg) for asset_cfg in self.real_estate_assets_cfg]
 
-        # Create main data structure
-        dates = pd.date_range(self.start, self.end, freq='MS').date
-        self.df = pd.DataFrame(index=dates)
+        # Konvertiere Start/Ende in datetime.date
+        self.start_date = as_date(self.plan_cfg["start"])
+        self.end_date = as_date(self.plan_cfg["end"])
+
+        # Erzeuge PeriodIndex für start und end, als Index für das zentrale DataFrame df
+        self.start = pd.Period(self.start_date, freq=PERIOD_FREQ)
+        self.end = pd.Period(self.end_date, freq=PERIOD_FREQ)   
+
+        # Initialize the main data frame structure
+        period = pd.period_range(
+            self.start, self.end,
+            freq=PERIOD_FREQ
+        )
+        self.df = pd.DataFrame(index=period)
 
     # Property für Dauer des Plans
     @property
@@ -44,13 +55,13 @@ class Plan:
         """
         Simulates the plan by creating income and expenses components.
         """
-       
+        index = self.df.index
         # Simulate and add income and expenses to dataframe
-        self.df["salary"] = self._simulate_salary()
-        self.df["pension_ralf"] = self._simulate_pension_ralf()
-        self.df["pension_conni"] = self._simulate_pension_conni()
-        self.df["rental_income"] = self._simulate_rental_income()
-        self.df["sum_cross_income"] = self.df["salary"] + self.df["pension_ralf"] + self.df["pension_conni"] + self.df["rental_income"]
+        self.df["salary"] = self._simulate_salary(index)
+        self.df["pension_ralf"] = self._simulate_pension_ralf(index)
+        self.df["pension_conni"] = self._simulate_pension_conni(index)
+        self.df  = pd.merge(self.df, self._simulate_rental_income(index), how="outer")
+        self.df["sum_cross_income"] = self.df.sum(axis=1)
         self.df["sum_net_income"] = self.df["sum_cross_income"].apply(self.calculate_net_income)
         return self.df
 
@@ -83,90 +94,79 @@ class Plan:
 
         return net_salary/12  # return monthly net income
     
-    # def _simulate_income(self):
-    #     """
-    #     Simulates the income component of the plan and add it to the netral data frame.
-    #     """
-    #     # Get salary configurations
-
-    #     # Get Ralf's pension configurations
-    #     pension_ralf=self.cashflow["income"]["pension_ralf"]
-    #     pension_start_date=as_date(self.cashflow["income"]["pension_start"])
-    #     pension_end_date=as_date(self.cashflow["income"]["end"])
-
-    #     # Get Conni's pension configurations
-    #     pension_conni=self.cashflow["income"]["pension_conni"]
-    #     pension_conni_start_date=as_date(self.cashflow["income"]["pension_conni_start"])
-    #     pension_conni_end_date=as_date(self.cashflow["income"]["end"])
-
-    def _simulate_salary(self):
+    def _simulate_salary(self, index) -> pd.Series:
         """
         Simulates the salary income component and returns a pandas Series.
         """
         # Get salary configurations
-        salary=self.cashflow["income"]["gross_salary"]
-        salary_start_date = as_date(self.plan["start"])
-        salary_end_date   = as_date(self.plan["planned_end_of_salary_date"])
+        salary=self.cashflow_cfg["income"]["gross_salary"]
+        salary_start_date = as_date(self.plan_cfg["start"])
+        salary_end_date   = as_date(self.plan_cfg["planned_end_of_salary_date"])
 
         # Create an empty pd.Series with index from Plan
-        s = pd.Series(0.0, index=self.df.index, name="income_salary")
-        s[(self.df.index >= salary_start_date) & (self.df.index <= salary_end_date)] = salary
+        s = pd.Series(0.0, index=index, name="income_salary")
+        s[(index >= as_period(salary_start_date)) & 
+          (index <= as_period(salary_end_date))]        = salary
         return s
     
-    def _simulate_pension_ralf(self):
+    def _simulate_pension_ralf(self, index) -> pd.Series:
         """
         Simulates Ralf's pension income component and returns a pandas Series.
         """
-        pension_ralf = self.cashflow["income"]["pension_ralf"]
-        pension_start_date = as_date(self.plan["planned_retirement_date_ralf"])
-        pension_end_date = as_date(self.plan["end"])
+        pension_ralf = self.cashflow_cfg["income"]["pension_ralf"]
+        pension_start_date = as_date(self.plan_cfg["planned_retirement_date_ralf"])
+        pension_end_date = as_date(self.plan_cfg["end"])
 
         # Create an empty pd.Series with index from Plan
         s = pd.Series(0.0, index=self.df.index, name="income_pension_ralf")
-        s[(self.df.index >= pension_start_date) & (self.df.index <= pension_end_date)] = pension_ralf
+        s[(index >= as_period(pension_start_date)) & 
+          (index <= as_period(pension_end_date))]      = pension_ralf
         return s
-    
-    def _simulate_pension_conni(self):
+
+    def _simulate_pension_conni(self, index) -> pd.Series:
         """
         Simulates Conni's pension income component and returns a pandas Series.
         """
-        pension_conni = self.cashflow["income"]["pension_conni"]
-        pension_start_date = as_date(self.plan["planned_retirement_date_conni"])
-        pension_end_date = as_date(self.plan["end"])
+        pension_conni = self.cashflow_cfg["income"]["pension_conni"]
+        pension_start_date = as_date(self.plan_cfg["planned_retirement_date_conni"])
+        pension_end_date = as_date(self.plan_cfg["end"])
 
         # Create an empty pd.Series with index from Plan
         s = pd.Series(0.0, index=self.df.index, name="income_pension_conni")
-        s[(self.df.index >= pension_start_date) & (self.df.index <= pension_end_date)] = pension_conni
+        s[(index >= as_period(pension_start_date)) & 
+          (index <= as_period(pension_end_date))]      = pension_conni
         return s
 
-    def _simulate_rental_income(self):
+    def _simulate_rental_income(self, index) -> pd.DataFrame:
         """
-        Simulates rental income component and returns a pandas Series.
+        Simulates rental income component and returns a pandas DataFrame.
         For now, it uses a fixed value from the config.
         In the future, it could be extended to calculate based on real estate assets.
         """
+        rental_income_df = pd.DataFrame(index=index)
+        for asset in self.real_estate_assets:
+            name = f"Miete_{asset.name}"
+            # Add the rental income series to the DataFrame
+            rental_income_df[name] = asset.rental_income_series(self.df.index)
+        # Add a total rental income column
+        rental_income_df["rental_income"] = rental_income_df.sum(axis=1)
+        return rental_income_df
 
-        # assets_by_name = {asset["name"]: asset for asset in self.real_estate_assets}
+            
 
-        rental_income = self.cashflow["income"]["rental_income"]
-        rental_start_date = as_date(self.plan["start"])
-        rental_end_date = as_date(self.plan["end"])
-
-        # Create an empty pd.Series with index from Plan
-        s = pd.Series(0.0, index=self.df.index, name="rental_income")
-        s[(self.df.index >= rental_start_date) & (self.df.index <= rental_end_date)] = rental_income
-        return s
-
-    def _simulate_expenses(self):
+    def _simulate_expenses(self, index) -> pd.DataFrame:
         """
-        Simulates the expenses component of the plan and add it to the netral data frame.
+        Simulates the expenses component of the plan and add it to the central data frame.
         """
-        loan_expenses = self.cashflow["expenses"]["loan"]
-        living_expenses = self.cashflow["expenses"]["living"]
-
         # Create a DataFrame for expenses
-        expenses_df = pd.DataFrame(index=self.df.index)
-        expenses_df['loan'] = loan_expenses
-        expenses_df['living'] = living_expenses
+        expenses_df = pd.DataFrame(index=index)
+        for asset in self.real_estate_assets:
+            # Get the loan payment DataFrame for the asset
+            loan_payments = asset.loan_payment_df(index)
+            # Add the loan payments to the main DataFrame
+            expenses_df = expenses_df.join(loan_payments, how='outer')
+        
+        # expenses_df['loan'] = loan_expenses
+        # expenses_df['living'] = living_expenses
 
         return expenses_df

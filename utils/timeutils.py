@@ -47,3 +47,20 @@ def zero_series(start: date, end: date, name: str
     """
     index = date_range_index(start, end, freq)
     return pd.Series(0.0, index=index, name=name)
+
+def as_period(val, freq="M") -> pd.Period:
+    """
+    Converts a datetime.date to a pandas Period object with a monthly frequency.
+    If the value is already a Period, it returns it as is.
+    If the value is a date, it converts it to a Period.
+
+    Parameters:
+        val: The value to convert, can be a date or a Period.
+        freq (str): Frequency string compatible with pandas (default: 'M' = Month)
+
+    Returns:
+        pd.Period: A pandas Period object
+    """
+    if isinstance(val, pd.Period):
+        return val
+    return pd.Period(val, freq=freq)

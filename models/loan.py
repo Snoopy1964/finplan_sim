@@ -5,7 +5,8 @@ import pandas as pd
 # from dataclasses import dataclass, field
 from datetime import date
 # from typing import Dict, List, Union
-
+from utils.cfg_parser import parse_date, parse_float
+from utils.constants import PERIOD_FREQ
 # @dataclass
 # class ExtraPayment:
 #     date: date
@@ -19,15 +20,17 @@ from datetime import date
 
 class Loan:
 
-    def __init__(self, name, opening_date, principal, interest_rate, monthly_payment):
-        self.name = name                             # name of the loan (Name des Kredites)
-        self.opening_date = opening_date             # date when the loan was opened (Auszahlungsdatum des Kredits)
-        self.principal = principal                   # principal amount of the loan (Höhe des Kreditbetrages)
-        self.initial_interest_rate = interest_rate   # initial interest rate (Anfänglicher Zinssatz)
-        # self.initial_repayment_rate = repayment_rate # initial annual repayment rate (Anfängliche jährlicheTilgungsrate)
+    def __init__(self, name, opening_date, remaining_principal, interest_rate, monthly_payment):
+        self.name = f"Kredit_{name}"                      # name of the loan (Name des Kredites)
+        self.opening_date = opening_date                  # date when the loan was opened (Auszahlungsdatum des Kredits)
+        self.remaining_principal = remaining_principal    # principal amount of the loan (Höhe des Kreditbetrages)
+        self.initial_interest_rate = interest_rate        # initial interest rate (Anfänglicher Zinssatz)
         self.initial_monthly_payment = monthly_payment
+
         # Calculate monthly payment based on principal, interest rate and repayment rate
-        self.initial_payment_rate = round((self.initial_monthly_payment * 12 / self.principal * 100) - self.initial_interest_rate, 2)  # monthly payment rate in percent (Monatliche Tilgungsrate in Prozent)
+        self.initial_payment_rate = round((self.initial_monthly_payment * 12 / 
+                                           self.remaining_principal * 100)   - 
+                                           self.initial_interest_rate, 5)  # monthly payment rate in percent (Monatliche Tilgungsrate in Prozent)
 
         # Initialize action lists
         self.actions = []
@@ -38,10 +41,26 @@ class Loan:
                              "date": self.opening_date, 
                              "new_payment": self.initial_monthly_payment})
 
+
+    @classmethod
+    def from_cfg(cls, cfg):
+        """Liste von Loan-Configs zu Loan-Objekten."""
+        try:
+            return cls(
+                name=cfg["name"],
+                opening_date=parse_date(cfg["opening_date"]),
+                remaining_principal=parse_float(cfg["remaining_principal"]),
+                interest_rate=parse_float(cfg["interest_rate"]),
+                monthly_payment=parse_float(cfg["monthly_payment"]),
+            )
+        except KeyError as e:
+            print((f"Missing required field in loan config: {e}"))
+            # raise ValueError(f"Missing required field in loan config: {e}")
+    
     def _create_payment_df(self, months = 12):
         """Create a DataFrame for the loan payments over a specified number of months."""
         data =  []
-        remaining = self.principal
+        remaining = self.remaining_principal
         interest_rate = self.initial_interest_rate
         monthly_payment = self.initial_monthly_payment
 

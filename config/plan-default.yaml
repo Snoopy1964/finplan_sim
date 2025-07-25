@@ -25,51 +25,59 @@ cashflow:
     # capital_drawdown:
     #   monthly: 2000
     #   sales_value: 500000
-  expenses: {}
+  expenses: 
+    loans:                           # Consumer loans
+      - name: PV_Anlage
+        remaining_principal: 13435.94
+        opening_date: 2025-07-01     # Date of remaining principal
+        interest_rate: 4.010594      # = 4.01% annual interest rate
+        monthly_payment: 561.10
+
 real_estate_assets:
-- name: Ludwigshafen
+- name: Lu
   purchase_price: 130000
   area_m2: 236
-  rent_per_m2: 8.97
   indexed_rent_per_year: 0.018
+  annual_rent: 23760.00      # Momentan noch die Entnahmen vom Hauskonto um Kosten zu "simulieren", sind das die Netto Mieteinnahmen
   planned_sale_date: 2025-10-31
   estimated_value: 500000
   valuation_date: 2025-05-31
   loans:
   - name: BW
-    remaining_principal: 107390.8
-    interest_rate: 0.0187           # = 1.87% annual interest rate
-    number_of_payments: 436
+    remaining_principal: 107103.44
+    opening_date: 2025-06-30        # Date of remaining principal
+    interest_rate: 1.87             # = 1.87% annual interest rate
     monthly_payment: 310.92
-- name: Walldorf
+- name: Wdf
   purchase_price: 347678
   area_m2: 165
-  rent_per_m2: 0.00                 # Eigennutzung, daher keine Mieteinnahmen
   indexed_rent_per_year: 0.00       # keine Indexmiete, da selbst genutzt
+  annual_rent: 0.00                 # Eigennutzung, daher keine Mieteinnahmen
+  estimated_value: 700000.00        # Aktueller Wert, da keine Mieteinnahmen
   planned_sale_date: 2064-12-31     # Verkauf nicht geplant
   valuation_date: 2025-05-31
   loans:
   - name: AXA
-    remaining_principal: 79543.71
-    interest_rate: 0.0354           # = 3.54% annual interest rate
-    number_of_payments: 92
+    remaining_principal: 78018.11
+    opening_date: 2025-06-30        # Date of remaining principal
+    interest_rate: 3.54             # = 3.54% annual interest rate
     monthly_payment: 996.33
-- name: Leipzig
+- name: Lpz
   purchase_price: 160000
-  area_m2: 774.89
-  rent_per_m2: 8.8
+  area_m2: 74.89
   indexed_rent_per_year: null
+  annual_rent: 5072.52     # Mieteinnahmen nach Abzug aller Kosten (Mietpool und Abrechnung)
   planned_sale_date: 2025-12-31
   estimated_value: 251000
   valuation_date: 2025-05-31
   loans:
   - name: DB
-    remaining_principal: 72149.69
-    interest_rate: 0.0105           # = 1.05% annual interest rate
-    number_of_payments: 84
+    remaining_principal: 71589.04
+    opening_date: 2025-06-16        # Date of remaining principal
+    interest_rate: 1.05             # = 1.05% annual interest rate
     monthly_payment: 623.78
   - name: DB_KFW
-    remaining_principal: 5352.58
-    interest_rate: 0.015             # = 1.5% annual interest rate
-    number_of_payments: 59
+    remaining_principal: 5265.09
+    opening_date: 2025-06-16        # Date of remaining principal
+    interest_rate: 1.50             # = 1.50% annual interest rate
     monthly_payment: 94.18
